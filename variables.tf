@@ -39,6 +39,10 @@ variable "topic_labels" {
   type        = map(string)
   description = "A map of labels to assign to the Pub/Sub topic."
   default     = {}
+  validation {
+    condition     = alltrue([contains(keys(var.topic_labels), "component")])
+    error_message = "Please include at least 'component' Label."
+  }
 }
 
 variable "push_subscriptions" {
@@ -48,6 +52,10 @@ variable "push_subscriptions" {
   }))
   description = "The list of the push subscriptions and it's labels."
   default     = []
+  validation {
+    condition     = alltrue([ for l in var.push_subscriptions : contains(keys(l.subscription_labels), "component")])
+    error_message = "Please include at least 'component' Label in subscription_labels."
+  }
 }
 
 variable "pull_subscriptions" {
@@ -57,6 +65,10 @@ variable "pull_subscriptions" {
   }))
   description = "The list of the pull subscriptions and it's labels."
   default     = []
+  validation {
+    condition     = alltrue([ for l in var.pull_subscriptions : contains(keys(l.subscription_labels), "component")])
+    error_message = "Please include at least 'component' Label in subscription_labels."
+  }
 }
 
 variable "topic_message_retention_duration" {
