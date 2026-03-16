@@ -1,6 +1,4 @@
 provider "google" {
-  project                     = var.project_id
-  impersonate_service_account = "terraform@${var.project_id}.iam.gserviceaccount.com"
 }
 
 module "airship-providers" {
@@ -204,7 +202,9 @@ resource "google_pubsub_subscription" "pull_subscriptions" {
 }
 
 resource "google_pubsub_subscription_iam_member" "pull_subscription_sa_binding_subscriber" {
-  for_each = var.create_subscriptions ? {for i in var.pull_subscriptions : i.subscription_details.name => i if lookup(i, "service_account", null) != null} : {}
+  for_each = var.create_subscriptions ? {
+    for i in var.pull_subscriptions : i.subscription_details.name => iif lookup(i, "service_account", null) != null
+  } : {}
 
   project      = var.project_id
   subscription = each.value.subscription_details.name
@@ -216,7 +216,9 @@ resource "google_pubsub_subscription_iam_member" "pull_subscription_sa_binding_s
 }
 
 resource "google_pubsub_subscription_iam_member" "pull_subscription_sa_binding_viewer" {
-  for_each = var.create_subscriptions ? {for i in var.pull_subscriptions : i.subscription_details.name => i if lookup(i, "service_account", null) != null} : {}
+  for_each = var.create_subscriptions ? {
+    for i in var.pull_subscriptions : i.subscription_details.name => iif lookup(i, "service_account", null) != null
+  } : {}
 
   project      = var.project_id
   subscription = each.value.subscription_details.name
