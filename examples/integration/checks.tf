@@ -2,6 +2,8 @@ check "push_subscription_keeps_requested_backoff" {
   data "google_pubsub_subscription" "push" {
     project = var.project_id
     name    = "${var.name_prefix}-push"
+
+    depends_on = [module.full]
   }
 
   assert {
@@ -14,6 +16,8 @@ check "pull_subscription_has_dead_letter_policy" {
   data "google_pubsub_subscription" "pull" {
     project = var.project_id
     name    = "${var.name_prefix}-pull"
+
+    depends_on = [module.full]
   }
 
   assert {
@@ -26,6 +30,8 @@ check "pull_subscription_grants_service_account" {
   data "google_pubsub_subscription_iam_policy" "pull" {
     project      = var.project_id
     subscription = "${var.name_prefix}-pull"
+
+    depends_on = [module.full]
   }
 
   assert {
