@@ -16,4 +16,4 @@ terraform-infrastructure `integration-tests/pubsub/` calls this directory throug
 
 Check failures are reported as warnings by `terraform plan` and `terraform apply`.
 
-A change to the module's variables updates this example in the same PR.
+The PR body of each terraform-infrastructure integration test run has a `pubsub coverage` section that lists the module variables this example leaves unset.
