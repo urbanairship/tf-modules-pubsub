@@ -1,5 +1,5 @@
 resource "google_service_account" "pubsub" {
-  project    = "ua-jmusy-ai-playground"
+  project    = var.project_id
   account_id = "it-pubsub"
 }
 

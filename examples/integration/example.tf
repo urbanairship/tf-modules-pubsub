@@ -4,7 +4,7 @@ locals {
 
 module "dead_letter_topic" {
   source               = "github.com/urbanairship/tf-modules-pubsub?ref=v2"
-  project_id           = "ua-jmusy-ai-playground"
+  project_id           = var.project_id
   topic                = "it-pubsub-dead-letter"
   create_subscriptions = false
   topic_labels         = local.labels
@@ -12,7 +12,7 @@ module "dead_letter_topic" {
 
 module "full" {
   source                           = "github.com/urbanairship/tf-modules-pubsub?ref=v2"
-  project_id                       = "ua-jmusy-ai-playground"
+  project_id                       = var.project_id
   topic                            = "it-pubsub-full"
   topic_labels                     = local.labels
   topic_message_retention_duration = "86400s"
@@ -74,7 +74,7 @@ module "full" {
 
 module "subscriptions_only" {
   source       = "github.com/urbanairship/tf-modules-pubsub?ref=v2"
-  project_id   = "ua-jmusy-ai-playground"
+  project_id   = var.project_id
   topic        = module.full.topic
   create_topic = false
 
@@ -88,7 +88,7 @@ module "subscriptions_only" {
 
 check "push_subscription_keeps_requested_backoff" {
   data "google_pubsub_subscription" "push" {
-    project    = "ua-jmusy-ai-playground"
+    project    = var.project_id
     name       = "it-pubsub-push"
     depends_on = [module.full]
   }
@@ -101,7 +101,7 @@ check "push_subscription_keeps_requested_backoff" {
 
 check "pull_subscription_has_dead_letter_policy" {
   data "google_pubsub_subscription" "pull" {
-    project    = "ua-jmusy-ai-playground"
+    project    = var.project_id
     name       = "it-pubsub-pull"
     depends_on = [module.full]
   }
@@ -114,7 +114,7 @@ check "pull_subscription_has_dead_letter_policy" {
 
 check "pull_subscription_grants_service_account" {
   data "google_pubsub_subscription_iam_policy" "pull" {
-    project      = "ua-jmusy-ai-playground"
+    project      = var.project_id
     subscription = "it-pubsub-pull"
     depends_on   = [module.full]
   }
