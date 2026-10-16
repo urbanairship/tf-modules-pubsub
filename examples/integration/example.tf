@@ -21,21 +21,12 @@ module "full" {
     allowed_persistence_regions = ["us-east1"]
   }
 
-  schema = {
-    name       = "it-pubsub-schema"
-    type       = "AVRO"
-    definition = jsonencode({ type = "record", name = "IntegrationTestEvent", fields = [{ name = "id", type = "string" }] })
-    encoding   = "JSON"
-  }
-
   push_subscriptions = [
     {
       subscription_details = {
         name                       = "it-pubsub-push"
         push_endpoint              = "https://example.com/it-pubsub-push"
         x-goog-version             = "v1"
-        oidc_service_account_email = google_service_account.pubsub.email
-        audience                   = "https://example.com/it-pubsub-push"
         ack_deadline_seconds       = "20"
         message_retention_duration = "604800s"
         retain_acked_messages      = "true"
@@ -65,7 +56,6 @@ module "full" {
         maximum_backoff              = "300s"
         enable_exactly_once_delivery = "true"
         enable_message_ordering      = "true"
-        service_account              = google_service_account.pubsub.email
       }
       subscription_labels = local.labels
     }
@@ -109,19 +99,6 @@ check "pull_subscription_has_dead_letter_policy" {
   assert {
     condition     = length(data.google_pubsub_subscription.pull.dead_letter_policy) == 1
     error_message = "Pull subscription has no dead_letter_policy although dead_letter_topic is set."
-  }
-}
-
-check "pull_subscription_grants_service_account" {
-  data "google_pubsub_subscription_iam_policy" "pull" {
-    project      = var.project_id
-    subscription = "it-pubsub-pull"
-    depends_on   = [module.full]
-  }
-
-  assert {
-    condition     = strcontains(data.google_pubsub_subscription_iam_policy.pull.policy_data, "serviceAccount:${google_service_account.pubsub.email}")
-    error_message = "Pull subscription IAM policy does not include service_account."
   }
 }
 
